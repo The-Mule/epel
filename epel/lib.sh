@@ -317,11 +317,12 @@ epelLibraryLoaded() {
     rlFail "wrong release format"
     return 6
   }
-  if rlIsRHEL '>=6.8'; then
+  # Since dl.fedoraproject.org dropped TLS <1.2 support,
+  # older RHELs cannot use NSS to connect to it over HTTPS anymore.
+  # Also, we need to use http when running in fingertip.
+  if ! rlIsRHEL '<6.8' && [[ "$TEST_EXECUTION_ENVIRONMENT" != "fingertip" ]]; then
     PROTO='https'
   else
-    # Since dl.fedoraproject.org dropped TLS <1.2 support,
-    # older RHELs cannot use NSS to connect to it over HTTPS anymore.
     PROTO='http'
   fi
   for j in 1 2 3; do
